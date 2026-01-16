@@ -1,0 +1,915 @@
+
+
+
+
+Documento Funcional y Técnico
+Sistema de Comercio Electrónico - EcommerceDB
+“Este documento está dirigido tanto a personal técnico (desarrolladores, DBAs) como a usuarios de negocio (gerentes, analistas) que necesiten comprender el funcionamiento del sistema.”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ÍNDICE
+Resumen Ejecutivo
+Introducción y Alcance del Proyecto
+Objetivos del Sistema
+Arquitectura de Datos
+Diccionario de Datos Detallado
+Reglas de Negocio
+Flujos de Procesos (Workflows)
+Matriz de Seguridad y Control de Acceso
+Requisitos Técnicos
+Mantenimiento y Respaldos
+Métricas y KPIs
+Anexos
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. INTRODUCCIÓN Y ALCANCE DEL PROYECTO
+2.1. Contexto de Negocio: "SmartCommerce S.A."
+SmartCommerce es una empresa minorista en expansión que actualmente gestiona sus ventas, inventarios y envíos de forma manual o mediante hojas de cálculo aisladas. Con un catálogo de más de 100 productos y una base creciente de 200 clientes activos, la empresa enfrenta dificultades para:
+Sincronizar el stock en tiempo real.
+Rastrear el estado de los pedidos de forma eficiente.
+Identificar el comportamiento de compra (carritos abandonados vs. ventas exitosas).
+La necesidad de centralizar la operación en una estructura relacional sólida (la base de datos EcommerceDB) es el primer paso para la transformación digital de la compañía.
+2.2 Justificación del Desarrollo del Portal Web
+El desarrollo de un portal web basado en esta arquitectura de base de datos se justifica por los siguientes pilares estratégicos:
+A. Escalabilidad y Disponibilidad 24/7
+A diferencia de una tienda física, el portal web permite que SmartCommerce reciba pedidos en cualquier momento. La base de datos está diseñada para manejar múltiples transacciones simultáneas, permitiendo que el negocio crezca en volumen de pedidos (como los 1,500 ya simulados) sin colapsar la operación.
+B. Mejora de la Experiencia del Cliente (UX)
+El portal web, conectado a las tablas de TrackingDelivery y CarritoCompras, ofrece transparencia. El cliente puede:
+Retomar compras iniciadas (Carrito).
+Saber exactamente dónde está su paquete (Tracking).
+Elegir su medio de pago preferido, lo que reduce la fricción y aumenta la conversión.
+C. Toma de Decisiones Basada en Datos (Business Intelligence)
+El portal web no es solo un sitio de ventas, sino una herramienta de análisis. Los gerentes pueden ver en tiempo real qué categorías son más rentables y qué proveedores cumplen mejor con los tiempos de entrega.
+
+
+D. Optimización del Inventario
+La conexión automática entre los Pedidos y el Stock de los productos previene la "sobreventa" (vender algo que no hay). Esto protege la reputación de la marca y optimiza la inversión en capital de trabajo al comprar a los proveedores solo lo que realmente tiene alta rotación.
+
+2.0 Diseño y Desarrollo de la BD
+La base de datos de EcommerceDB permitirá gestionar el ciclo completo de venta en digital desde su portal web, desde la navegación del catálogo de productos en el carrito de compras hasta la entrega final al cliente y el historial de seguimiento.
+Gestión de catálogos de productos organizados jerárquicamente
+Procesamiento de pedidos con múltiples medios de pago
+Seguimiento logístico en tiempo real
+Control de inventario automático
+Análisis de comportamiento del cliente (tasas de abandono, ticket promedio)
+2.1 ¿Qué problema resuelve este sistema?
+La Base de datos EcommerceDB centraliza toda la información necesaria para operar una tienda en línea, eliminando la necesidad de múltiples hojas de cálculo o sistemas desconectados. Permite:
+Saber qué productos están disponibles y cuántos hay en stock
+Registrar quién compró qué y por cuánto dinero
+Rastrear dónde está cada pedido en el proceso de entrega
+Analizar qué productos se venden más y cuáles se abandonan en el carrito
+2.2 ¿Quiénes usarán este sistema?
+Clientes finales: Navegan el catálogo, agregan productos al carrito y realizan compras
+Personal de almacén: Actualizan inventario y procesan envíos
+Administradores: Gestionan precios, proveedores y reportes financieros
+2.3 Límites del sistema
+Este documento cubre únicamente la estructura de la base de datos. No incluye:
+Diseño de interfaces gráficas (frontend)
+Integraciones con pasarelas de pago externas
+Configuración de servidores web
+
+3. OBJETIVOS DEL SISTEMA
+Objetivos Funcionales
+Registrar productos con su precio, stock y proveedor asociado
+Procesar pedidos capturando el precio histórico al momento de la venta
+Rastrear entregas mediante un sistema de estados (Pendiente → Enviado → Entregado)
+Proteger información sensible mediante roles de acceso diferenciados
+Objetivos Técnicos
+Garantizar integridad referencial entre todas las tablas
+Permitir auditoría completa del ciclo de vida de cada pedido
+Optimizar consultas para generar reportes en tiempo real
+Facilitar escalabilidad futura (ej: agregar múltiples almacenes)
+4. ARQUITECTURA DE DATOS
+El sistema está organizado en tres capas lógicas que separan los datos según su función:
+4.1 Capa de Maestros (Datos de Catálogo)
+Contiene información que cambia poco frecuentemente:
+Tabla
+Propósito
+Ejemplo de Datos
+Clientes
+Información de contacto y dirección de envío
+Juan Pérez, Lima, Perú
+Proveedores
+Empresas que suministran productos
+Samsung Electronics, Corea
+Categorías
+Clasificación principal de productos
+Electrónica, Ropa, Hogar
+Subcategorías
+Clasificación secundaria
+Smartphones (dentro de Electrónica)
+Productos
+Inventario disponible con precios
+iPhone 15, S/3,500, Stock: 25
+
+Analogía: Piensa en esta capa como el "catálogo impreso" de una tienda física que se actualiza cada temporada.
+
+
+
+4.2 Capa Transaccional (Movimientos Diarios)
+Registra las operaciones del día a día:
+Tabla
+Propósito
+Frecuencia de Uso
+CarritoCompras
+Items seleccionados pero no comprados aún
+Alta (miles por día)
+Pedidos
+Cabecera de cada venta (¿quién compró cuándo?)
+Media (cientos por día)
+DetallePedidos
+Desglose de productos en cada pedido
+Alta (múltiples por pedido)
+
+Analogía: Es como el registro de caja de una tienda, que se llena constantemente con nuevas transacciones.
+4.3 Capa de Control (Logística y Auditoría)
+Facilita el seguimiento y control de calidad:
+Tabla
+Propósito
+Ejemplo de Uso
+EstadosPedido
+Catálogo de hitos posibles
+Pendiente, Pagado, Enviado, Entregado
+MediosPago
+Formas de pago aceptadas
+Yape, Tarjeta Visa, Transferencia
+TrackingDelivery
+Historial de cambios de estado
+15/01: Enviado, 17/01: Entregado
+
+Analogía: Como el sistema de rastreo de paquetes de una empresa de courier.
+5. DICCIONARIO DE DATOS DETALLADO
+5.1 Tabla: Clientes
+Propósito: Almacenar información de los usuarios registrados en la plataforma.
+Campo
+Tipo de Dato
+¿Obligatorio?
+¿Único?
+Descripción
+ClienteID
+Entero (INT)
+✔
+✔
+Número de identificación único (se genera automáticamente)
+NombreCompleto
+Texto (150 caracteres)
+✔
+✗
+Nombre y apellidos del cliente
+Email
+Texto (100 caracteres)
+✔
+✔
+Correo electrónico (se usa como login)
+Telefono
+Texto (20 caracteres)
+✗
+✗
+Número de contacto
+DireccionEnvio
+Texto largo
+✔
+✗
+Dirección completa para entregas
+Ciudad
+Texto (50 caracteres)
+✔
+✗
+Ciudad de residencia
+
+Regla de negocio: No pueden existir dos clientes con el mismo email.
+Ejemplo de registro:
+ClienteID: 1
+NombreCompleto: María García López
+Email: maria.garcia@email.com
+Telefono: +51 987 654 321
+DireccionEnvio: Av. Javier Prado 2456, San Isidro
+Ciudad: Lima
+5.2 Tabla: Proveedores
+Propósito: Registro de empresas que suministran los productos vendidos.
+Campo
+Tipo de Dato
+¿Obligatorio?
+Valor por Defecto
+Descripción
+ProveedorID
+Entero (INT)
+✔
+(automático)
+Identificador único
+NombreEmpresa
+Texto (100 caracteres)
+✔
+-
+Razón social o nombre comercial
+ContactoNombre
+Texto (100 caracteres)
+✗
+-
+Nombre del representante
+Telefono
+Texto (20 caracteres)
+✗
+-
+Teléfono de contacto
+Email
+Texto (100 caracteres)
+✗
+-
+Correo corporativo
+Pais
+Texto (50 caracteres)
+✗
+"Perú"
+País de origen
+
+Ejemplo de registro:
+ProveedorID: 5
+NombreEmpresa: Tech Distributors S.A.C.
+ContactoNombre: Carlos Mendoza
+Email: cmendoza@techdist.com
+Pais: Perú
+5.3 Tabla: Categorías
+Propósito: Clasificación de primer nivel para organizar productos (ej: Electrónica, Ropa).
+Campo
+Tipo de Dato
+¿Obligatorio?
+Descripción
+CategoriaID
+Entero (INT)
+✔
+Identificador único
+NombreCategoria
+Texto (50 caracteres)
+✔
+Nombre de la categoría
+Descripcion
+Texto largo
+✗
+Descripción opcional
+
+5.4 Tabla: Subcategorías
+Propósito: Clasificación de segundo nivel (ej: Smartphones dentro de Electrónica).
+Campo
+Tipo de Dato
+¿Obligatorio?
+Relación
+Descripción
+SubcategoriaID
+Entero (INT)
+✔
+-
+Identificador único
+CategoriaID
+Entero (INT)
+✔
+→ Categorias
+Categoría padre
+NombreSub
+Texto (50 caracteres)
+✔
+-
+Nombre de la subcategoría
+
+Relación padre-hijo: Una categoría puede tener múltiples subcategorías, pero cada subcategoría pertenece a una sola categoría.
+Ejemplo:
+Categoría: Electrónica (ID: 1)
+  ├── Subcategoría: Smartphones (ID: 10)
+  ├── Subcategoría: Laptops (ID: 11)
+  └── Subcategoría: Tablets (ID: 12)
+5.5 Tabla: Productos
+Propósito: Inventario de artículos disponibles para la venta.
+Campo
+Tipo de Dato
+¿Obligatorio?
+Restricción
+Descripción
+ProductoID
+Entero (INT)
+✔
+-
+Identificador único
+SubcategoriaID
+Entero (INT)
+✔
+→ Subcategorias
+Clasificación del producto
+ProveedorID
+Entero (INT)
+✔
+→ Proveedores
+Empresa proveedora
+NombreProducto
+Texto (150 caracteres)
+✔
+-
+Nombre comercial
+PrecioUnitario
+Decimal (10,2)
+✔
+> 0
+Precio actual de venta
+Stock
+Entero (INT)
+✗
+≥ 0
+Cantidad disponible (inicia en 0)
+
+Regla crítica: El PrecioUnitario debe ser siempre mayor a cero (no se permiten productos gratis por error).
+Ejemplo de registro:
+ProductoID: 101
+NombreProducto: Samsung Galaxy S24 Ultra 256GB
+SubcategoriaID: 10 (Smartphones)
+ProveedorID: 5
+PrecioUnitario: 4,299.00
+Stock: 15
+5.6 Tabla: CarritoCompras
+Propósito: Registro temporal de productos que el cliente ha seleccionado pero aún no ha comprado.
+Campo
+Tipo de Dato
+¿Obligatorio?
+Valor por Defecto
+Descripción
+CarritoID
+Entero (INT)
+✔
+(automático)
+Identificador único
+ClienteID
+Entero (INT)
+✔
+-
+Cliente propietario del carrito
+ProductoID
+Entero (INT)
+✔
+-
+Producto agregado
+Cantidad
+Entero (INT)
+✔
+-
+Unidades seleccionadas
+FechaAgregado
+Fecha/Hora
+✗
+(fecha actual)
+Cuándo se agregó al carrito
+
+Uso práctico: Esta tabla permite calcular la tasa de abandono de carrito, un KPI crucial en e-commerce.
+5.7 Tabla: Pedidos (Cabecera de Venta)
+Propósito: Registro maestro de cada transacción completada.
+Campo
+Tipo de Dato
+¿Obligatorio?
+Descripción
+PedidoID
+Entero (INT)
+✔
+Número único de pedido
+ClienteID
+Entero (INT)
+✔
+Quién realizó la compra
+MedioPagoID
+Entero (INT)
+✔
+Cómo pagó (Yape, tarjeta, etc.)
+EstadoID
+Entero (INT)
+✔
+Estado actual del pedido
+FechaPedido
+Fecha/Hora
+✔
+Cuándo se realizó la compra
+Total
+Decimal (10,2)
+✔
+Monto total de la venta
+
+Relación con otras tablas:
+Un pedido tiene un solo cliente (relación 1:1)
+Un pedido puede tener múltiples productos (relación 1:N con DetallePedidos)
+5.8 Tabla: DetallePedidos
+Propósito: Desglose línea por línea de qué productos incluyó cada pedido.
+Campo
+Tipo de Dato
+¿Obligatorio?
+Descripción
+DetalleID
+Entero (INT)
+✔
+Identificador de la línea
+PedidoID
+Entero (INT)
+✔
+Pedido al que pertenece
+ProductoID
+Entero (INT)
+✔
+Producto vendido
+Cantidad
+Entero (INT)
+✔
+Unidades vendidas
+PrecioHistorico
+Decimal (10,2)
+✔
+Precio al momento de la venta
+
+¿Por qué Precio Histórico?
+Imagina este escenario:
+Hoy: Un producto cuesta S/100 y se vende una unidad
+Mañana: El producto sube a S/120
+Si no guardamos el precio histórico, al calcular las ventas de ayer, el sistema mostraría S/120 en lugar de los S/100 reales. Esto distorsionaría los reportes financieros.
+Ejemplo de pedido con detalle:
+PEDIDO (Cabecera):
+PedidoID: 5001
+ClienteID: 1 (María García)
+FechaPedido: 15/01/2026
+Total: S/8,598.00
+
+DETALLE PEDIDO:
+DetalleID: 1 | ProductoID: 101 | Cantidad: 2 | PrecioHistorico: 4,299.00
+  → 2 × Samsung Galaxy S24 = S/8,598.00
+5.9 Tabla: MediosPago
+Propósito: Catálogo de formas de pago aceptadas.
+Campo
+Tipo de Dato
+¿Obligatorio?
+Descripción
+MedioPagoID
+Entero (INT)
+✔
+Identificador único
+NombreMedio
+Texto (50 caracteres)
+✔
+Nombre del medio de pago
+
+Ejemplos: Yape, Tarjeta Visa, Tarjeta Mastercard, Transferencia Bancaria, Contra Entrega.
+5.10 Tabla: EstadosPedido
+Propósito: Catálogo de estados posibles para un pedido.
+Campo
+Tipo de Dato
+¿Obligatorio?
+Descripción
+EstadoID
+Entero (INT)
+✔
+Identificador único
+NombreEstado
+Texto (50 caracteres)
+✔
+Nombre del estado
+
+Estados típicos (en orden secuencial):
+Pendiente → Pedido recibido, esperando pago
+Pagado → Pago confirmado
+Preparando → Empaquetando el pedido
+Enviado → En camino al cliente
+Entregado → Recibido por el cliente
+Cancelado → Pedido anulado
+5.11 Tabla: TrackingDelivery
+Propósito: Historial de auditoría de todos los cambios de estado de un pedido.
+Campo
+Tipo de Dato
+¿Obligatorio?
+Descripción
+TrackingID
+Entero (INT)
+✔
+Identificador único
+PedidoID
+Entero (INT)
+✔
+Pedido rastreado
+EstadoID
+Entero (INT)
+✔
+Estado registrado
+FechaCambio
+Fecha/Hora
+✔
+Cuándo ocurrió el cambio
+Observaciones
+Texto largo
+✗
+Notas adicionales
+
+Ejemplo de tracking:
+PedidoID: 5001
+  ├── 15/01 10:30 → Pendiente | "Esperando confirmación de pago"
+  ├── 15/01 11:00 → Pagado | "Pago Yape confirmado"
+  ├── 15/01 15:00 → Enviado | "Courier: Olva. Guía: ABC123456"
+  └── 17/01 09:00 → Entregado | "Recibido por María García"
+Esta tabla permite calcular el tiempo de entrega (Lead Time) restando fechas.
+
+
+
+
+6. REGLAS DE NEGOCIO
+6.1 Integridad Referencial (Relaciones Obligatorias)
+Estas reglas no pueden ser violadas bajo ninguna circunstancia:
+Regla
+Significado en lenguaje simple
+No puede haber un Producto sin un Proveedor
+Todo artículo debe tener un proveedor asignado
+No puede haber un Pedido sin un Cliente
+Toda venta debe estar asociada a un comprador
+No puede haber un DetallePedido sin un Pedido
+No se puede vender algo que no esté en un pedido
+No puede haber una Subcategoría sin una Categoría
+Toda clasificación secundaria debe tener una principal
+
+Consecuencia técnica: Si intentas eliminar un Proveedor que tiene productos asociados, la base de datos rechazará la operación para evitar datos huérfanos.
+6.2 Captura de Precio Histórico
+Proceso automatizado:
+Cuando se crea una nueva línea en DetallePedidos, el sistema debe:
+Leer el PrecioUnitario actual de la tabla Productos
+Copiar ese valor en la columna PrecioHistorico de DetallePedidos
+Esto garantiza que, aunque el precio cambie mañana, el registro histórico permanezca intacto
+Ejemplo:
+ANTES DE LA VENTA:
+Productos.PrecioUnitario = 4,299.00
+
+DURANTE LA VENTA:
+DetallePedidos.PrecioHistorico = 4,299.00 (copia del precio actual)
+
+DESPUÉS DE LA VENTA:
+Productos.PrecioUnitario = 4,499.00 (precio actualizado)
+DetallePedidos.PrecioHistorico = 4,299.00 (preserva el precio de venta)
+
+6.3 Flujo de Estados (Secuencial)
+Los pedidos deben seguir un orden lógico de estados:
+Pendiente → Pagado → Preparando → Enviado → Entregado
+Reglas adicionales:
+Un pedido nace siempre en estado "Pendiente"
+No se puede saltar directamente de "Pendiente" a "Entregado" sin pasar por estados intermedios
+Un pedido "Cancelado" es un estado terminal (no puede cambiar a otro estado después)
+6.4 Control de Inventario
+Regla crítica: Cuando se confirma un pedido (inserta en DetallePedidos), el sistema debe:
+Leer la Cantidad vendida
+Restar esa cantidad del Stock en la tabla Productos
+Ejemplo:
+ANTES:
+Productos.Stock = 15 unidades
+
+VENTA:
+DetallePedidos.Cantidad = 2 unidades
+
+DESPUÉS:
+Productos.Stock = 13 unidades (15 - 2)
+Restricción: No se puede vender más unidades de las que hay en stock. Si un producto tiene Stock = 0, el sistema debe rechazar la venta.
+6.5 Validaciones de Datos
+Campo
+Validación
+Razón
+PrecioUnitario
+Debe ser > 0
+No existen productos gratis (evita errores de digitación)
+Stock
+Debe ser ≥ 0
+No puede haber inventario negativo
+Email
+Debe ser único
+No pueden existir dos clientes con el mismo correo
+Cantidad (DetallePedidos)
+Debe ser > 0
+No se pueden vender 0 unidades
+
+
+7. FLUJOS DE PROCESOS (WORKFLOWS)
+7.1 Proceso: Compra Completa (Happy Path)
+Este es el flujo ideal cuando todo sale bien:
+Paso
+Acción del Usuario
+Acción del Sistema
+Tabla Afectada
+1
+Cliente navega el catálogo
+Muestra productos con Stock > 0
+Productos (SELECT)
+2
+Cliente agrega producto al carrito
+Inserta registro temporal
+CarritoCompras (INSERT)
+3
+Cliente aumenta cantidad en carrito
+Actualiza cantidad
+CarritoCompras (UPDATE)
+4
+Cliente procede al checkout
+Valida stock disponible
+Productos (SELECT)
+5
+Cliente selecciona medio de pago
+Muestra opciones activas
+MediosPago (SELECT)
+6
+Cliente confirma pago
+Crea pedido en estado "Pendiente"
+Pedidos (INSERT)
+7
+Sistema procesa pago
+Traslada items del carrito al pedido
+DetallePedidos (INSERT)
+8
+Sistema confirma pago
+Actualiza estado a "Pagado"
+Pedidos (UPDATE)
+9
+Sistema reduce inventario
+Resta stock vendido
+Productos (UPDATE)
+10
+Sistema limpia carrito
+Elimina items del carrito
+CarritoCompras (DELETE)
+11
+Almacén empaca pedido
+Cambia estado a "Preparando"
+TrackingDelivery (INSERT)
+12
+Courier recoge paquete
+Cambia estado a "Enviado"
+TrackingDelivery (INSERT)
+13
+Cliente recibe pedido
+Cambia estado a "Entregado"
+TrackingDelivery (INSERT)
+
+Tiempo estimado: 2-5 días hábiles (desde el Paso 6 hasta el Paso 13).
+7.2 Proceso: Abandono de Carrito
+Cuando el cliente no completa la compra:
+Paso
+Acción
+Tabla Afectada
+1
+Cliente agrega productos al carrito
+CarritoCompras (INSERT)
+2
+Cliente cierra la página sin comprar
+Ninguna
+3
+Sistema mantiene el carrito por 30 días
+CarritoCompras (sin cambios)
+4
+Después de 30 días, sistema limpia carrito
+CarritoCompras (DELETE)
+
+Métrica: Los registros en CarritoCompras sin un PedidoID asociado indican abandono.
+7.3 Proceso: Cancelación de Pedido
+Paso
+Acción
+Tabla Afectada
+Observaciones
+1
+Cliente solicita cancelación
+Ninguna
+Solo pedidos en estado "Pendiente" o "Pagado"
+2
+Sistema verifica estado
+Pedidos (SELECT)
+No se pueden cancelar pedidos "Enviados"
+3
+Sistema devuelve stock
+Productos (UPDATE)
+Suma las cantidades vendidas de vuelta
+4
+Sistema cambia estado
+Pedidos (UPDATE)
+EstadoID = Cancelado
+5
+Sistema registra cancelación
+TrackingDelivery (INSERT)
+Con observaciones del motivo
+
+7.4 Proceso: Actualización de Precio
+Cuando un administrador cambia el precio de un producto:
+Paso
+Acción
+Impacto
+1
+Administrador actualiza PrecioUnitario
+Productos (UPDATE)
+2
+Nuevas ventas usan el precio nuevo
+DetallePedidos (INSERT) con nuevo precio
+3
+Ventas antiguas mantienen su precio
+DetallePedidos (sin cambios) gracias a PrecioHistorico
+
+Ventaja: Los reportes de ventas pasadas siempre reflejan los precios reales de cada transacción.
+8. MATRIZ DE SEGURIDAD Y CONTROL DE ACCESO
+El sistema implementa RBAC (Role-Based Access Control), donde cada usuario tiene permisos específicos según su rol.
+8.1 Rol: Administrador del Sistema
+Responsabilidades: Configuración global, supervisión financiera, gestión de catálogos.
+Tabla
+SELECT
+INSERT
+UPDATE
+DELETE
+Notas
+Clientes
+✔
+✔
+✔
+✔
+Acceso completo
+Proveedores
+✔
+✔
+✔
+✔
+Gestión de proveedores
+Categorías
+✔
+✔
+✔
+✔
+Configuración de catálogo
+Subcategorías
+✔
+✔
+✔
+✔
+Configuración de catálogo
+Productos
+✔
+✔
+✔
+✔
+Gestión de precios y stock
+Pedidos
+✔
+✗
+✔
+✗
+Puede cambiar estados, no borrar
+DetallePedidos
+✔
+✗
+✗
+✗
+Solo lectura (auditoría)
+MediosPago
+✔
+✔
+✔
+✔
+Configuración de pagos
+EstadosPedido
+✔
+✔
+✔
+✗
+No se eliminan estados históricos
+TrackingDelivery
+✔
+✗
+✗
+✗
+Solo lectura (auditoría)
+
+Riesgo: Acceso a información financiera sensible. Se recomienda auditoría de acciones.
+
+
+
+8.2 Rol: Gestor de Almacén y Logística
+Responsabilidades: Control de inventario, procesamiento de envíos.
+Tabla
+SELECT
+INSERT
+UPDATE
+DELETE
+Notas
+Clientes
+✔
+✗
+✗
+✗
+Solo para verificar direcciones
+Productos
+✔
+✗
+✔
+✗
+Puede actualizar Stock solamente
+Pedidos
+✔
+✗
+✔
+✗
+Puede cambiar EstadoID solamente
+DetallePedidos
+✔
+✗
+✗
+✗
+Solo lectura
+TrackingDelivery
+✔
+✔
+✔
+✗
+Registra cambios de estado
+
+Restricciones críticas:
+No puede: Ver datos de pago, modificar precios, eliminar pedidos
+No puede: Acceder a información de otros clientes más allá de la necesaria para el envío
+8.3 Rol: Cliente (Usuario Final)
+Responsabilidades: Navegar catálogo, realizar compras, consultar sus pedidos.
+Tabla
+SELECT
+INSERT
+UPDATE
+DELETE
+Notas
+Productos
+✔
+✗
+✗
+✗
+Catálogo público
+Categorías
+✔
+✗
+✗
+✗
+Navegación del sitio
+Subcategorías
+✔
+✗
+✗
+✗
+Navegación del sitio
+CarritoCompras
+✔
+✔
+✔
+✔
+Solo su propio carrito
+Pedidos
+✔
+✔
+✗
+✗
+Solo sus propios pedidos
+DetallePedidos
+✔
+✗
+✗
+✗
+Solo detalles de sus pedidos
+TrackingDelivery
+✔
+✗
+✗
+✗
+Solo tracking de sus pedidos
+
+Filtro de seguridad: Todas las consultas deben incluir WHERE ClienteID = [ID del usuario logueado] para evitar que un cliente vea información de otros.
+Restricciones críticas:
+No puede: Ver productos de otros carritos, pedidos de otros clientes, datos de proveedores
+No puede: Modificar estados de pedidos directamen
+
