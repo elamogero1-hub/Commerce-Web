@@ -1,5 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { db } from "./db";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
+import * as schema from "@shared/schema";
+
+const { Pool } = pg;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -30,12 +34,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     };
 
     try {
-      // Try a simple query
-      const result = await db.execute("SELECT 1 as connected");
-      dbStatus.connected = true;
-      dbStatus.result = result;
+      if (!dbUrl) {
+        dbStatus.error = "DATABASE_URL not set";
+      } else {
+        const pool = new Pool({ connectionString: dbUrl });
+        const db = drizzle(pool, { schema });
+        
+        // Try a simple query
+        const result = await db.execute("SELECT 1 as connected");
+        dbStatus.connected = true;
+        dbStatus.result = result;
+        
+        await pool.end();
+      }
     } catch (queryError) {
-      dbStatus.error = `Query failed: ${String(queryError)}`;
+      dbStatus.error = `Connection failed: ${String(queryError)}`;
     }
 
     res.status(200).json({

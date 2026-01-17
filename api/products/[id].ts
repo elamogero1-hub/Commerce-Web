@@ -1,7 +1,20 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { db } from "../db";
-import { products } from "@shared/schema";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
+import * as schema from "@shared/schema";
 import { eq } from "drizzle-orm";
+
+const { Pool } = pg;
+const { products } = schema;
+
+// Initialize DB connection inline
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  throw new Error("DATABASE_URL is not set");
+}
+
+const pool = new Pool({ connectionString: dbUrl });
+const db = drizzle(pool, { schema });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
