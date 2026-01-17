@@ -23,14 +23,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   let pool;
+  let responseSent = false;
   try {
     const dbUrl = process.env.DATABASE_URL;
     if (!dbUrl) {
       throw new Error("DATABASE_URL is not set");
     }
 
-    // Create pool per request (Vercel serverless best practice)
-    pool = new Pool({ connectionString: dbUrl, max: 1 });
+    // Create pool with connection timeout
+    pool = new Pool({ 
+      connectionString: dbUrl, 
+      max: 1,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000
+    });
     const db = drizzle(pool, { schema });
 
     const cats = await db.select().from(categories);
@@ -40,16 +46,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       result.push({ ...cat, subcategories: subs });
     }
     res.status(200).json(result);
+    responseSent = true;
   } catch (error) {
-    console.error("Categories API Error:", error);
-    res.status(500).json({
-      message: "Internal Server Error",
-      error: process.env.NODE_ENV === "development" ? String(error) : undefined,
-    });
+    if (!responseSent) {
+      console.error("Categories API Error:", error);
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: process.env.NODE_ENV === "development" ? String(error) : undefined,
+      });
+      responseSent = true;
+    }
   } finally {
     // Always close the pool after the request
-    if (pool) {
-      await pool.end();
+    try {
+      if (pool) {
+        await pool.end();
+      }
+    } catch (closeError) {
+      console.error("Error closing pool:", closeError);
     }
   }
 }
