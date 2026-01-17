@@ -45,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log("Deleting cart item with ID:", id);
 
     const result = await client.query(
-      `DELETE FROM cart_items WHERE id = $1 RETURNING id`,
+      `DELETE FROM cart_items WHERE cart_id = $1 RETURNING cart_id as id`,
       [Number(id)]
     );
 
@@ -57,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    res.status(204).end();
+    res.status(200).json({ success: true, id: result.rows[0].id });
     responseSent = true;
   } catch (error) {
     if (!responseSent) {

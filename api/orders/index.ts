@@ -55,6 +55,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       );
 
       const orderId = orderResult.rows[0].id;
+      const orderData = {
+        ...orderResult.rows[0],
+        total: parseFloat(String(orderResult.rows[0].total))
+      };
       console.log("Order created with ID:", orderId);
 
       // Add order items if order_items table exists
@@ -84,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       client.release();
       
-      res.status(201).json(orderResult.rows[0]);
+      res.status(201).json(orderData);
       responseSent = true;
     } else if (req.method === "GET") {
       // Get orders by clientId
@@ -107,8 +111,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         [clientId]
       );
 
+      const ordersData = result.rows.map(row => ({
+        ...row,
+        total: parseFloat(String(row.total))
+      }));
+
       client.release();
-      res.status(200).json(result.rows);
+      res.status(200).json(ordersData);
       responseSent = true;
     }
   } catch (error) {
