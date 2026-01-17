@@ -43,9 +43,9 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   async getProducts(subcategoryId?: number, search?: string): Promise<Product[]> {
     if (subcategoryId) {
-      return await db.select().from(products).where(eq(products.subcategoryId, subcategoryId));
+      return await db.select().from(products).where(eq(products.subcategoryId, subcategoryId)) as any;
     }
-    return await db.select().from(products);
+    return await db.select().from(products) as any;
   }
 
   async getProduct(id: number): Promise<Product | undefined> {
