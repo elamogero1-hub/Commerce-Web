@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db } from "@lib/db";
 import { 
   products, categories, subcategories, clients, cartItems, orders, orderItems, deliveryTracking,
   type Product, type Category, type Subcategory, type Client, type CartItem, type Order, 
