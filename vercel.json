@@ -1,9 +1,6 @@
 {
   "version": 2,
   "buildCommand": "npm run build:client",
-  "outputDirectory": "dist/public",
-  "env": {
-    "NODE_ENV": "production"
-  }
+  "outputDirectory": "dist/public"
 }
 
