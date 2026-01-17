@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "vite build --config vite.config.ts",
+  "buildCommand": "npm run build:client",
   "outputDirectory": "dist/public",
   "functions": {
     "api/**/*.ts": {
