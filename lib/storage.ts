@@ -1,4 +1,4 @@
-import { db } from "../server/db";
+import { db } from "./db";
 import { 
   products, categories, subcategories, clients, cartItems, orders, orderItems, deliveryTracking,
   type Product, type Category, type Subcategory, type Client, type CartItem, type Order, 
@@ -6,6 +6,7 @@ import {
   orderStates, paymentMethods, suppliers
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 export interface IStorage {
   // Products
@@ -88,7 +89,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createOrder(orderData: any): Promise<Order> {
-    return await db.transaction(async (tx) => {
+    return await db.transaction(async (tx: any) => {
       const [newOrder] = await tx.insert(orders).values({
         clientId: orderData.clientId,
         paymentMethodId: orderData.paymentMethodId,
