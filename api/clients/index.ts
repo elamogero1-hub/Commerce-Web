@@ -1,0 +1,98 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { Pool } from "pg";
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+
+  let pool;
+  let responseSent = false;
+  
+  try {
+    const dbUrl = process.env.DATABASE_URL;
+    if (!dbUrl) {
+      throw new Error("DATABASE_URL is not set");
+    }
+
+    pool = new Pool({ 
+      connectionString: dbUrl, 
+      ssl: { rejectUnauthorized: false },
+      max: 1,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000
+    });
+
+    const client = await pool.connect();
+
+    if (req.method === "POST") {
+      // POST - Create client
+      const { fullName, email, phone, address, city } = req.body;
+      
+      if (!fullName || !email || !address || !city) {
+        res.status(400).json({ message: "Missing required fields" });
+        responseSent = true;
+        return;
+      }
+
+      const result = await client.query(
+        `INSERT INTO clients (full_name, email, phone, address, city) 
+         VALUES ($1, $2, $3, $4, $5) 
+         RETURNING client_id as id, full_name as fullName, email, phone, address, city, created_at as createdAt`,
+        [fullName, email, phone || null, address, city]
+      );
+
+      client.release();
+      res.status(201).json(result.rows[0]);
+      responseSent = true;
+    } else if (req.method === "GET") {
+      // GET - Get client by email
+      const { email } = req.query;
+      
+      if (!email) {
+        res.status(400).json({ message: "Email is required" });
+        responseSent = true;
+        return;
+      }
+
+      const result = await client.query(
+        `SELECT client_id as id, full_name as fullName, email, phone, address, city, created_at as createdAt 
+         FROM clients WHERE email = $1`,
+        [email]
+      );
+
+      client.release();
+      
+      if (result.rows.length === 0) {
+        res.status(404).json({ message: "Client not found" });
+        responseSent = true;
+        return;
+      }
+
+      res.status(200).json(result.rows[0]);
+      responseSent = true;
+    }
+  } catch (error) {
+    if (!responseSent) {
+      console.error("Clients API Error:", error);
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: process.env.NODE_ENV === "development" ? String(error) : undefined,
+      });
+      responseSent = true;
+    }
+  } finally {
+    try {
+      if (pool) {
+        await pool.end();
+      }
+    } catch (closeError) {
+      console.error("Error closing pool:", closeError);
+    }
+  }
+}
