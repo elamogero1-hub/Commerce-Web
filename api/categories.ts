@@ -1,11 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import * as schema from "@shared/schema";
-import { eq } from "drizzle-orm";
-
-const { Pool } = pg;
-const { categories, subcategories } = schema;
+import { Pool } from "pg";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -24,6 +18,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   let pool;
   let responseSent = false;
+  
   try {
     const dbUrl = process.env.DATABASE_URL;
     if (!dbUrl) {
@@ -33,18 +28,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Create pool with connection timeout
     pool = new Pool({ 
       connectionString: dbUrl, 
+      ssl: { rejectUnauthorized: false },
       max: 1,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000
     });
-    const db = drizzle(pool, { schema });
 
-    const cats = await db.select().from(categories);
+    const client = await pool.connect();
+    
+    const catsResult = await client.query("SELECT * FROM categories ORDER BY category_id");
     const result = [];
-    for (const cat of cats) {
-      const subs = await db.select().from(subcategories).where(eq(subcategories.categoryId, cat.id));
-      result.push({ ...cat, subcategories: subs });
+    
+    for (const cat of catsResult.rows) {
+      const subsResult = await client.query(
+        "SELECT * FROM subcategories WHERE category_id = $1 ORDER BY subcategory_id",
+        [cat.category_id]
+      );
+      result.push({ 
+        ...cat, 
+        subcategories: subsResult.rows 
+      });
     }
+    
+    client.release();
+    
     res.status(200).json(result);
     responseSent = true;
   } catch (error) {

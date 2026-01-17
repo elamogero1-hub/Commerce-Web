@@ -1,11 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import * as schema from "@shared/schema";
-import { eq } from "drizzle-orm";
-
-const { Pool } = pg;
-const { products } = schema;
+import { Pool } from "pg";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -34,21 +28,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Create pool with connection timeout
     pool = new Pool({ 
       connectionString: dbUrl, 
+      ssl: { rejectUnauthorized: false },
       max: 1,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000
     });
-    const db = drizzle(pool, { schema });
 
     const subcategoryId = req.query.subcategoryId ? Number(req.query.subcategoryId) : undefined;
     
-    let query = db.select().from(products);
+    let query = "SELECT * FROM products WHERE active = true";
+    const params: any[] = [];
+    
     if (subcategoryId) {
-      query = query.where(eq(products.subcategoryId, subcategoryId)) as any;
+      query += " AND subcategory_id = $1";
+      params.push(subcategoryId);
     }
     
-    const result = await query;
-    res.status(200).json(result);
+    query += " ORDER BY product_id";
+    
+    const client = await pool.connect();
+    const result = await client.query(query, params);
+    client.release();
+    
+    res.status(200).json(result.rows);
     responseSent = true;
   } catch (error) {
     if (!responseSent) {

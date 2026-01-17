@@ -1,20 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import * as schema from "@shared/schema";
-import { eq } from "drizzle-orm";
-
-const { Pool } = pg;
-const { products } = schema;
-
-// Initialize DB connection inline
-const dbUrl = process.env.DATABASE_URL;
-if (!dbUrl) {
-  throw new Error("DATABASE_URL is not set");
-}
-
-const pool = new Pool({ connectionString: dbUrl });
-const db = drizzle(pool, { schema });
+import { Pool } from "pg";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -39,14 +24,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error("DATABASE_URL is not set");
     }
 
-    // Create pool with connection timeout
     pool = new Pool({ 
       connectionString: dbUrl, 
+      ssl: { rejectUnauthorized: false },
       max: 1,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000
     });
-    const db = drizzle(pool, { schema });
 
     const { id } = req.query;
     if (!id) {
@@ -55,15 +39,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const [product] = await db.select().from(products).where(eq(products.id, Number(id)));
+    const client = await pool.connect();
+    const result = await client.query("SELECT * FROM products WHERE product_id = $1", [Number(id)]);
+    client.release();
     
-    if (!product) {
+    if (result.rows.length === 0) {
       res.status(404).json({ message: "Product not found" });
       responseSent = true;
       return;
     }
 
-    res.status(200).json(product);
+    res.status(200).json(result.rows[0]);
     responseSent = true;
   } catch (error) {
     if (!responseSent) {
@@ -75,7 +61,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       responseSent = true;
     }
   } finally {
-    // Always close the pool after the request
     try {
       if (pool) {
         await pool.end();

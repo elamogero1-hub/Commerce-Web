@@ -48,6 +48,7 @@ export const products = pgTable("products", {
   stock: integer("stock").default(0),
   description: text("description"),
   imageUrl: text("image_url"),
+  active: boolean("active").default(true),
 });
 
 // 5.6 Tabla: CarritoCompras
