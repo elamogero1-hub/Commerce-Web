@@ -7,15 +7,6 @@ import { eq } from "drizzle-orm";
 const { Pool } = pg;
 const { categories, subcategories } = schema;
 
-// Initialize DB connection inline
-const dbUrl = process.env.DATABASE_URL;
-if (!dbUrl) {
-  throw new Error("DATABASE_URL is not set");
-}
-
-const pool = new Pool({ connectionString: dbUrl });
-const db = drizzle(pool, { schema });
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -31,7 +22,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  let pool;
   try {
+    const dbUrl = process.env.DATABASE_URL;
+    if (!dbUrl) {
+      throw new Error("DATABASE_URL is not set");
+    }
+
+    // Create pool per request (Vercel serverless best practice)
+    pool = new Pool({ connectionString: dbUrl, max: 1 });
+    const db = drizzle(pool, { schema });
+
     const cats = await db.select().from(categories);
     const result = [];
     for (const cat of cats) {
@@ -45,5 +46,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       message: "Internal Server Error",
       error: process.env.NODE_ENV === "development" ? String(error) : undefined,
     });
+  } finally {
+    // Always close the pool after the request
+    if (pool) {
+      await pool.end();
+    }
   }
 }
