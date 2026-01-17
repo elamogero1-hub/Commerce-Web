@@ -7,6 +7,16 @@
       "includeFiles": "lib/**,shared/**",
       "maxDuration": 30
     }
-  }
+  },
+  "routes": [
+    {
+      "src": "/api/.*",
+      "continue": true
+    },
+    {
+      "src": "/(?!api).*",
+      "dest": "/index.html"
+    }
+  ]
 }
 
