@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { DatabaseStorage } from "../server/storage";
+import { storage } from "../lib/storage";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
@@ -18,11 +18,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const storage = new DatabaseStorage();
+    const storage_instance = storage;
     const subcategoryId = req.query.subcategoryId ? Number(req.query.subcategoryId) : undefined;
     const search = req.query.search as string | undefined;
     
-    const products = await storage.getProducts(subcategoryId, search);
+    const products = await storage_instance.getProducts(subcategoryId, search);
     res.status(200).json(products);
   } catch (error) {
     console.error("Products API Error:", error);

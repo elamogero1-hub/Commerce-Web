@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { DatabaseStorage } from "../../server/storage";
+import { storage } from "../../lib/storage";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
@@ -24,8 +24,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const storage = new DatabaseStorage();
-    const product = await storage.getProduct(Number(id));
+    const storage_instance = storage;
+    const product = await storage_instance.getProduct(Number(id));
     
     if (!product) {
       res.status(404).json({ message: "Product not found" });

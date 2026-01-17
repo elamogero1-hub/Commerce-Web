@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { DatabaseStorage } from "../server/storage";
+import { storage } from "../lib/storage";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
@@ -18,8 +18,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const storage = new DatabaseStorage();
-    const categories = await storage.getCategories();
+    const storage_instance = storage;
+    const categories = await storage_instance.getCategories();
     res.status(200).json(categories);
   } catch (error) {
     console.error("Categories API Error:", error);

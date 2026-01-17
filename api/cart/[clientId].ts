@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { DatabaseStorage } from "../../server/storage";
+import { storage } from "../../lib/storage";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
@@ -24,8 +24,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const storage = new DatabaseStorage();
-    const cart = await storage.getCart(Number(clientId));
+    const storage_instance = storage;
+    const cart = await storage_instance.getCart(Number(clientId));
     res.status(200).json(cart);
   } catch (error) {
     console.error("Cart API Error:", error);
