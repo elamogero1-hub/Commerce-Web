@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { registerRoutes } from "../../server/routes";
+import { registerRoutes } from "../server/routes";
 import { createServer } from "http";
 import express, { type Request, Response, NextFunction } from "express";
 
