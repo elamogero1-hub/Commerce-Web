@@ -4,6 +4,7 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/**/*.ts": {
+      "includeFiles": ["server/**", "shared/**"],
       "maxDuration": 30
     }
   },
