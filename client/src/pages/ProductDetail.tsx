@@ -29,13 +29,13 @@ export default function ProductDetail() {
         quantity: 1,
       });
       toast({
-        title: "Added to cart",
-        description: `${product.name} has been added to your cart.`,
+        title: "Agregado al carrito",
+        description: `${product.name} ha sido agregado a tu carrito.`,
       });
     } catch (err) {
       toast({
         title: "Error",
-        description: "Failed to add item to cart.",
+        description: "No se pudo agregar el artículo al carrito.",
         variant: "destructive",
       });
     }
@@ -66,10 +66,10 @@ export default function ProductDetail() {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-          <h2 className="text-2xl font-bold mb-2">Product not found</h2>
-          <p className="text-muted-foreground mb-4">The product you are looking for does not exist.</p>
+          <h2 className="text-2xl font-bold mb-2">Producto no encontrado</h2>
+          <p className="text-muted-foreground mb-4">El producto que buscas no existe.</p>
           <Link href="/catalog">
-            <Button>Back to Catalog</Button>
+            <Button>Volver al Catálogo</Button>
           </Link>
         </div>
         <Footer />
@@ -85,7 +85,7 @@ export default function ProductDetail() {
       
       <main className="flex-1 container px-4 py-8 md:px-6">
         <Link href="/catalog" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6 transition-colors">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Catalog
+          <ArrowLeft className="mr-2 h-4 w-4" /> Volver al Catálogo
         </Link>
         
         <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-start">
@@ -99,14 +99,14 @@ export default function ProductDetail() {
               />
             ) : (
               <div className="flex h-full items-center justify-center text-muted-foreground">
-                No Image Available
+                Sin Imagen Disponible
               </div>
             )}
             
             {product.stock === 0 && (
               <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-sm">
                 <span className="bg-destructive text-destructive-foreground px-4 py-2 rounded-full text-lg font-bold shadow-lg">
-                  Out of Stock
+                  Agotado
                 </span>
               </div>
             )}
@@ -121,7 +121,7 @@ export default function ProductDetail() {
                 </Badge>
                 {product.stock && product.stock < 5 && product.stock > 0 && (
                   <span className="text-sm font-medium text-amber-600">
-                    Only {product.stock} left in stock!
+                    ¡Solo quedan {product.stock} en stock!
                   </span>
                 )}
               </div>
@@ -134,7 +134,7 @@ export default function ProductDetail() {
             </div>
             
             <div className="prose prose-sm text-muted-foreground leading-relaxed">
-              <p>{product.description || "No description available for this product."}</p>
+              <p>{product.description || "No hay descripción disponible para este producto."}</p>
             </div>
             
             <div className="pt-6 border-t space-y-4">
@@ -144,9 +144,9 @@ export default function ProductDetail() {
                 onClick={handleAddToCart}
                 disabled={addToCart.isPending || product.stock === 0}
               >
-                {addToCart.isPending ? "Adding..." : (
+                {addToCart.isPending ? "Agregando..." : (
                   <>
-                    <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                    <ShoppingCart className="mr-2 h-5 w-5" /> Agregar al Carrito
                   </>
                 )}
               </Button>
@@ -155,15 +155,15 @@ export default function ProductDetail() {
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-secondary">
                   <Truck className="h-5 w-5 text-primary" />
                   <div className="text-sm">
-                    <span className="font-semibold block text-foreground">Fast Delivery</span>
-                    <span className="text-muted-foreground">2-4 business days</span>
+                    <span className="font-semibold block text-foreground">Entrega Rápida</span>
+                    <span className="text-muted-foreground">2-4 días hábiles</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-secondary">
                   <Shield className="h-5 w-5 text-primary" />
                   <div className="text-sm">
-                    <span className="font-semibold block text-foreground">Secure Checkout</span>
-                    <span className="text-muted-foreground">Encrypted payments</span>
+                    <span className="font-semibold block text-foreground">Pago Seguro</span>
+                    <span className="text-muted-foreground">Pagos encriptados</span>
                   </div>
                 </div>
               </div>

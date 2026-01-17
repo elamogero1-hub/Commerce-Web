@@ -25,13 +25,13 @@ export function Navbar() {
   const NavLinks = ({ mobile = false }) => (
     <>
       <Link href="/" className={`text-sm font-medium transition-colors hover:text-primary ${location === '/' ? 'text-primary' : 'text-muted-foreground'} ${mobile ? 'text-lg py-2' : ''}`}>
-        Home
+        Inicio
       </Link>
       <Link href="/catalog" className={`text-sm font-medium transition-colors hover:text-primary ${location === '/catalog' ? 'text-primary' : 'text-muted-foreground'} ${mobile ? 'text-lg py-2' : ''}`}>
-        Catalog
+        Catálogo
       </Link>
       <Link href="/tracking" className={`text-sm font-medium transition-colors hover:text-primary ${location === '/tracking' ? 'text-primary' : 'text-muted-foreground'} ${mobile ? 'text-lg py-2' : ''}`}>
-        Track Order
+        Rastrear Pedido
       </Link>
     </>
   );
@@ -57,7 +57,7 @@ export function Navbar() {
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="-ml-2">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
+                <span className="sr-only">Abrir Menú</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
@@ -80,7 +80,7 @@ export function Navbar() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search products..."
+              placeholder="Buscar productos..."
               className="pl-8 w-full bg-muted/50 focus:bg-background transition-colors"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -95,7 +95,7 @@ export function Navbar() {
                     {cartCount}
                   </span>
                 )}
-                <span className="sr-only">Shopping Cart</span>
+                <span className="sr-only">Carrito de Compras</span>
               </Button>
             </Link>
             <Link href="/profile">

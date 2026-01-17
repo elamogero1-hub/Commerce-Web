@@ -29,9 +29,9 @@ export default function Cart() {
   const handleRemove = async (id: number) => {
     try {
       await removeFromCart.mutateAsync({ id, clientId });
-      toast({ title: "Item removed" });
+      toast({ title: "Artículo eliminado" });
     } catch (error) {
-      toast({ title: "Error removing item", variant: "destructive" });
+      toast({ title: "Error al eliminar artículo", variant: "destructive" });
     }
   };
 
@@ -51,15 +51,15 @@ export default function Cart() {
       });
 
       toast({
-        title: "Order Placed Successfully!",
-        description: `Order #${order.id} has been created.`,
+        title: "¡Pedido Realizado Exitosamente!",
+        description: `El pedido #${order.id} ha sido creado.`,
       });
       
       setLocation(`/tracking/${order.id}`);
     } catch (error) {
       toast({
-        title: "Checkout Failed",
-        description: "Please try again later.",
+        title: "Error en el Pago",
+        description: "Por favor inténtalo nuevamente.",
         variant: "destructive",
       });
     }
@@ -70,7 +70,7 @@ export default function Cart() {
       <Navbar />
       
       <main className="flex-1 container px-4 py-8 md:px-6">
-        <h1 className="text-3xl font-display font-bold mb-8">Shopping Cart</h1>
+        <h1 className="text-3xl font-display font-bold mb-8">Carrito de Compras</h1>
         
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
@@ -83,10 +83,10 @@ export default function Cart() {
                 <div className="bg-muted inline-flex p-4 rounded-full mb-4">
                   <ShoppingBag className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
-                <p className="text-muted-foreground mb-6">Looks like you haven't added anything yet.</p>
+                <h3 className="text-lg font-semibold mb-2">Tu carrito está vacío</h3>
+                <p className="text-muted-foreground mb-6">Parece que aún no has agregado nada.</p>
                 <Link href="/catalog">
-                  <Button>Start Shopping</Button>
+                  <Button>Comenzar a Comprar</Button>
                 </Link>
               </div>
             ) : (
@@ -117,7 +117,7 @@ export default function Cart() {
                           onClick={() => handleRemove(item.id)}
                           disabled={removeFromCart.isPending}
                         >
-                          <Trash2 className="h-4 w-4 mr-1" /> Remove
+                          <Trash2 className="h-4 w-4 mr-1" /> Eliminar
                         </Button>
                       </div>
                     </CardContent>
@@ -130,7 +130,7 @@ export default function Cart() {
           <div className="lg:col-span-1">
             <Card className="sticky top-24 shadow-lg border-border/60">
               <CardContent className="p-6 space-y-6">
-                <h3 className="font-display font-bold text-xl">Order Summary</h3>
+                <h3 className="font-display font-bold text-xl">Resumen del Pedido</h3>
                 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
@@ -138,7 +138,7 @@ export default function Cart() {
                     <span className="font-medium">${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
+                    <span className="text-muted-foreground">Envío</span>
                     <span className="font-medium">${subtotal > 0 ? shipping.toFixed(2) : "0.00"}</span>
                   </div>
                   <Separator />
@@ -154,13 +154,13 @@ export default function Cart() {
                   onClick={handleCheckout}
                   disabled={!cartItems?.length || createOrder.isPending}
                 >
-                  {createOrder.isPending ? "Processing..." : (
-                    <>Checkout <ArrowRight className="ml-2 h-4 w-4" /></>
+                  {createOrder.isPending ? "Procesando..." : (
+                    <>Pagar <ArrowRight className="ml-2 h-4 w-4" /></>
                   )}
                 </Button>
                 
                 <p className="text-xs text-center text-muted-foreground">
-                  Secure checkout powered by Stripe.
+                  Pago seguro respaldado por Stripe.
                 </p>
               </CardContent>
             </Card>

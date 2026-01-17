@@ -12,30 +12,30 @@ export function Footer() {
               <span className="font-bold text-xl font-display">SmartCommerce</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-              Premium e-commerce solutions delivering quality products with seamless shopping experiences.
+              Soluciones de comercio electrónico premium que ofrecen productos de calidad con experiencias de compra fluidas.
             </p>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4 text-foreground">Shop</h3>
+            <h3 className="font-semibold mb-4 text-foreground">Tienda</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/catalog" className="hover:text-primary transition-colors">All Products</Link></li>
-              <li><Link href="/catalog?category=new" className="hover:text-primary transition-colors">New Arrivals</Link></li>
-              <li><Link href="/catalog?category=featured" className="hover:text-primary transition-colors">Featured</Link></li>
+              <li><Link href="/catalog" className="hover:text-primary transition-colors">Todos los Productos</Link></li>
+              <li><Link href="/catalog?category=new" className="hover:text-primary transition-colors">Nuevos Ingresos</Link></li>
+              <li><Link href="/catalog?category=featured" className="hover:text-primary transition-colors">Destacados</Link></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4 text-foreground">Support</h3>
+            <h3 className="font-semibold mb-4 text-foreground">Soporte</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/tracking" className="hover:text-primary transition-colors">Track Order</Link></li>
-              <li><Link href="/faq" className="hover:text-primary transition-colors">FAQs</Link></li>
-              <li><Link href="/contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
+              <li><Link href="/tracking" className="hover:text-primary transition-colors">Rastrear Pedido</Link></li>
+              <li><Link href="/faq" className="hover:text-primary transition-colors">Preguntas Frecuentes</Link></li>
+              <li><Link href="/contact" className="hover:text-primary transition-colors">Contáctanos</Link></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4 text-foreground">Connect</h3>
+            <h3 className="font-semibold mb-4 text-foreground">Conecta</h3>
             <div className="flex space-x-4">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Twitter className="h-5 w-5" />

@@ -30,13 +30,13 @@ export function ProductCard({ id, name, price, imageUrl, stock = 0 }: ProductCar
         quantity: 1,
       });
       toast({
-        title: "Added to cart",
-        description: `${name} has been added to your cart.`,
+        title: "Agregado al carrito",
+        description: `${name} ha sido agregado a tu carrito.`,
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Could not add item to cart.",
+        description: "No se pudo agregar el artículo al carrito.",
         variant: "destructive",
       });
     }
@@ -56,14 +56,14 @@ export function ProductCard({ id, name, price, imageUrl, stock = 0 }: ProductCar
             />
           ) : (
             <div className="flex h-full items-center justify-center bg-secondary text-muted-foreground">
-              No Image
+              Sin Imagen
             </div>
           )}
           
           {stock === 0 && (
             <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-sm">
               <span className="bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-sm font-bold">
-                Out of Stock
+                Agotado
               </span>
             </div>
           )}
@@ -84,7 +84,7 @@ export function ProductCard({ id, name, price, imageUrl, stock = 0 }: ProductCar
             variant={stock === 0 ? "secondary" : "default"}
           >
             <ShoppingCart className="h-4 w-4" />
-            {stock === 0 ? "Unavailable" : "Add to Cart"}
+            {stock === 0 ? "No Disponible" : "Agregar al Carrito"}
           </Button>
         </CardFooter>
       </Card>

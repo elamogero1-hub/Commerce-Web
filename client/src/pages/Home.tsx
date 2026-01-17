@@ -22,24 +22,24 @@ export default function Home() {
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
             <div className="space-y-6 animate-in">
               <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80">
-                New Collection Arrived
+                Nueva Colección Disponible
               </div>
               <h1 className="text-4xl font-display font-bold tracking-tight sm:text-6xl text-foreground">
-                Discover Premium Quality for Your Lifestyle
+                Descubre Calidad Premium para tu Estilo de Vida
               </h1>
               <p className="max-w-[600px] text-lg text-muted-foreground leading-relaxed">
-                SmartCommerce brings you curated products from top suppliers. 
-                Experience seamless shopping with fast delivery and secure payments.
+                SmartCommerce te trae productos seleccionados de los mejores proveedores. 
+                Experimenta compras fluidas con entrega rápida y pagos seguros.
               </p>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
                 <Link href="/catalog">
                   <Button size="lg" className="gap-2 text-base px-8 h-12 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
-                    Shop Now <ArrowRight className="h-4 w-4" />
+                    Comprar Ahora <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="/tracking">
                   <Button size="lg" variant="outline" className="text-base px-8 h-12">
-                    Track Order
+                    Rastrear Pedido
                   </Button>
                 </Link>
               </div>
@@ -74,29 +74,29 @@ export default function Home() {
             <div className="p-3 rounded-full bg-primary/10 text-primary mb-2">
               <ShoppingBag className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-lg">Curated Selection</h3>
-            <p className="text-sm text-muted-foreground">Handpicked products for quality assurance.</p>
+            <h3 className="font-bold text-lg">Selección Curada</h3>
+            <p className="text-sm text-muted-foreground">Productos seleccionados para garantizar calidad.</p>
           </div>
           <div className="flex flex-col items-center text-center space-y-2 p-4 rounded-xl hover:bg-muted/50 transition-colors">
             <div className="p-3 rounded-full bg-primary/10 text-primary mb-2">
               <Truck className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-lg">Fast Delivery</h3>
-            <p className="text-sm text-muted-foreground">Real-time tracking for every order.</p>
+            <h3 className="font-bold text-lg">Entrega Rápida</h3>
+            <p className="text-sm text-muted-foreground">Rastreo en tiempo real para cada pedido.</p>
           </div>
           <div className="flex flex-col items-center text-center space-y-2 p-4 rounded-xl hover:bg-muted/50 transition-colors">
             <div className="p-3 rounded-full bg-primary/10 text-primary mb-2">
               <ShieldCheck className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-lg">Secure Payment</h3>
-            <p className="text-sm text-muted-foreground">100% secure checkout process.</p>
+            <h3 className="font-bold text-lg">Pago Seguro</h3>
+            <p className="text-sm text-muted-foreground">Proceso de pago 100% seguro.</p>
           </div>
           <div className="flex flex-col items-center text-center space-y-2 p-4 rounded-xl hover:bg-muted/50 transition-colors">
             <div className="p-3 rounded-full bg-primary/10 text-primary mb-2">
               <Clock className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-lg">24/7 Support</h3>
-            <p className="text-sm text-muted-foreground">We are here to help anytime.</p>
+            <h3 className="font-bold text-lg">Soporte 24/7</h3>
+            <p className="text-sm text-muted-foreground">Estamos aquí para ayudarte en cualquier momento.</p>
           </div>
         </div>
       </section>
@@ -105,10 +105,10 @@ export default function Home() {
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container px-4 md:px-6">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-display font-bold tracking-tight">Shop by Category</h2>
+            <h2 className="text-3xl font-display font-bold tracking-tight">Comprar por Categoría</h2>
             <Link href="/catalog">
               <Button variant="ghost" className="gap-1">
-                View All <ArrowRight className="h-4 w-4" />
+                Ver Todo <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
@@ -136,7 +136,7 @@ export default function Home() {
       {/* Featured Products */}
       <section className="py-16 md:py-24">
         <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-display font-bold tracking-tight mb-8">Featured Products</h2>
+          <h2 className="text-3xl font-display font-bold tracking-tight mb-8">Productos Destacados</h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {productsLoading ? (
               Array(4).fill(0).map((_, i) => (

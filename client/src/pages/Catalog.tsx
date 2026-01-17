@@ -49,12 +49,12 @@ export default function Catalog() {
           <aside className="w-full md:w-64 space-y-8">
             <div>
               <h3 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
-                <Filter className="h-4 w-4" /> Filters
+                <Filter className="h-4 w-4" /> Filtros
               </h3>
               
               <div className="space-y-6">
                 <div>
-                  <h4 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wider">Categories</h4>
+                  <h4 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wider">Categorías</h4>
                   {categoriesLoading ? (
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-full" />
@@ -91,7 +91,7 @@ export default function Catalog() {
             
             {(selectedSubcategory || activeSearch) && (
               <Button variant="outline" className="w-full border-dashed" onClick={clearFilters}>
-                <X className="mr-2 h-4 w-4" /> Clear All Filters
+                <X className="mr-2 h-4 w-4" /> Limpiar Todos los Filtros
               </Button>
             )}
           </aside>
@@ -99,24 +99,24 @@ export default function Catalog() {
           {/* Main Content */}
           <main className="flex-1">
             <div className="mb-6 space-y-4">
-              <h1 className="text-3xl font-display font-bold">Catalog</h1>
+              <h1 className="text-3xl font-display font-bold">Catálogo</h1>
               
               <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    placeholder="Search products..." 
+                    placeholder="Buscar productos..." 
                     className="pl-9 bg-background"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <Button type="submit">Search</Button>
+                <Button type="submit">Buscar</Button>
               </form>
               
               {activeSearch && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  Results for: <Badge variant="secondary" className="text-foreground">{activeSearch}</Badge>
+                  Resultados para: <Badge variant="secondary" className="text-foreground">{activeSearch}</Badge>
                 </div>
               )}
             </div>
@@ -132,10 +132,10 @@ export default function Catalog() {
                 ))
               ) : products?.length === 0 ? (
                 <div className="col-span-full py-12 text-center border rounded-xl bg-muted/20">
-                  <h3 className="text-lg font-medium text-foreground">No products found</h3>
-                  <p className="text-muted-foreground">Try adjusting your search or filters.</p>
+                  <h3 className="text-lg font-medium text-foreground">No se encontraron productos</h3>
+                  <p className="text-muted-foreground">Intenta ajustar tu búsqueda o filtros.</p>
                   <Button variant="link" onClick={clearFilters} className="mt-2 text-primary">
-                    Clear filters
+                    Limpiar filtros
                   </Button>
                 </div>
               ) : (

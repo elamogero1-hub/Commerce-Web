@@ -51,18 +51,18 @@ export default function Tracking() {
       <main className="flex-1 container px-4 py-12 md:px-6">
         <div className="max-w-3xl mx-auto space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-3xl font-display font-bold">Track Your Order</h1>
-            <p className="text-muted-foreground">Enter your order ID to see the current status and delivery updates.</p>
+            <h1 className="text-3xl font-display font-bold">Rastrea tu Pedido</h1>
+            <p className="text-muted-foreground">Ingresa el ID de tu pedido para ver el estado actual y actualizaciones de entrega.</p>
             
             <form onSubmit={handleSearch} className="flex gap-2 max-w-md mx-auto mt-6">
               <Input
-                placeholder="Order ID (e.g., 123)"
+                placeholder="ID de Pedido (ej., 123)"
                 className="h-12 text-lg"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
               />
               <Button type="submit" size="lg" className="h-12 px-8">
-                Track
+                Rastrear
               </Button>
             </form>
           </div>
@@ -72,10 +72,10 @@ export default function Tracking() {
               <Card>
                 <CardHeader className="bg-muted/30 pb-4">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="font-display">Order #{id}</CardTitle>
+                    <CardTitle className="font-display">Pedido #{id}</CardTitle>
                     {orderDetails && (
                       <Badge variant="outline" className="bg-background">
-                        Placed on {format(new Date(orderDetails.orderDate!), 'MMM dd, yyyy')}
+                        Realizado el {format(new Date(orderDetails.orderDate!), 'dd MMM yyyy')}
                       </Badge>
                     )}
                   </div>
@@ -83,12 +83,12 @@ export default function Tracking() {
                 <CardContent className="pt-6">
                   {orderLoading || trackingLoading ? (
                     <div className="space-y-4 py-8 text-center">
-                      <p className="text-muted-foreground">Loading tracking details...</p>
+                      <p className="text-muted-foreground">Cargando detalles de seguimiento...</p>
                     </div>
                   ) : !orderDetails ? (
                     <div className="text-center py-8">
-                      <p className="text-destructive font-medium">Order not found.</p>
-                      <p className="text-muted-foreground text-sm mt-1">Please check the ID and try again.</p>
+                      <p className="text-destructive font-medium">Pedido no encontrado.</p>
+                      <p className="text-muted-foreground text-sm mt-1">Por favor verifica el ID e inténtalo nuevamente.</p>
                     </div>
                   ) : (
                     <div className="space-y-8">
@@ -115,7 +115,7 @@ export default function Tracking() {
                         
                         {(!trackingSteps || trackingSteps.length === 0) && (
                           <div className="pl-8">
-                            <p className="text-muted-foreground italic">No tracking updates yet.</p>
+                            <p className="text-muted-foreground italic">Aún no hay actualizaciones de seguimiento.</p>
                           </div>
                         )}
                       </div>
@@ -124,7 +124,7 @@ export default function Tracking() {
 
                       {/* Order Summary */}
                       <div>
-                        <h4 className="font-bold mb-4">Items in Order</h4>
+                        <h4 className="font-bold mb-4">Artículos en el Pedido</h4>
                         <div className="space-y-3">
                           {orderDetails.items?.map((item: any) => (
                             <div key={item.id} className="flex justify-between items-center text-sm">
