@@ -42,11 +42,10 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getProducts(subcategoryId?: number, search?: string): Promise<Product[]> {
-    let query = db.select().from(products);
     if (subcategoryId) {
-      query = query.where(eq(products.subcategoryId, subcategoryId));
+      return await db.select().from(products).where(eq(products.subcategoryId, subcategoryId));
     }
-    return await query;
+    return await db.select().from(products);
   }
 
   async getProduct(id: number): Promise<Product | undefined> {
