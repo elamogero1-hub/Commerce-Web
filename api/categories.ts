@@ -45,8 +45,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         [cat.category_id]
       );
       result.push({ 
-        ...cat, 
-        subcategories: subsResult.rows 
+        id: cat.category_id,
+        name: cat.name,
+        description: cat.description,
+        subcategories: subsResult.rows.map((sub: any) => ({
+          id: sub.subcategory_id,
+          categoryId: sub.category_id,
+          name: sub.name
+        }))
       });
     }
     

@@ -1,9 +1,10 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Pool } from "pg";
 
+// DELETE /api/cart/:id - Remove item from cart
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   
   if (req.method === "OPTIONS") {
@@ -11,7 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  if (req.method !== "GET") {
+  if (req.method !== "DELETE") {
     res.status(405).json({ message: "Method not allowed" });
     return;
   }
@@ -25,7 +26,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error("DATABASE_URL is not set");
     }
 
-    // Create pool with connection timeout
     pool = new Pool({ 
       connectionString: dbUrl, 
       ssl: { rejectUnauthorized: false },
@@ -34,39 +34,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       connectionTimeoutMillis: 10000
     });
 
-    const subcategoryId = req.query.subcategoryId ? Number(req.query.subcategoryId) : undefined;
+    const { id } = req.query;
     
-    let query = "SELECT * FROM products WHERE active = true";
-    const params: any[] = [];
-    
-    if (subcategoryId) {
-      query += " AND subcategory_id = $1";
-      params.push(subcategoryId);
+    if (!id) {
+      res.status(400).json({ message: "Cart item ID is required" });
+      responseSent = true;
+      return;
     }
-    
-    query += " ORDER BY product_id";
-    
+
     const client = await pool.connect();
-    const result = await client.query(query, params);
+    
+    const result = await client.query(
+      "DELETE FROM cart_items WHERE cart_id = $1",
+      [Number(id)]
+    );
+    
     client.release();
     
-    const transformedProducts = result.rows.map((p: any) => ({
-      id: p.product_id,
-      subcategoryId: p.subcategory_id,
-      supplierId: p.supplier_id,
-      name: p.name,
-      price: p.price,
-      stock: p.stock,
-      description: p.description,
-      imageUrl: p.image_url,
-      active: p.active
-    }));
+    if (result.rowCount === 0) {
+      res.status(404).json({ message: "Cart item not found" });
+      responseSent = true;
+      return;
+    }
     
-    res.status(200).json(transformedProducts);
+    res.status(204).end();
     responseSent = true;
   } catch (error) {
     if (!responseSent) {
-      console.error("Products API Error:", error);
+      console.error("Remove from Cart API Error:", error);
       res.status(500).json({
         message: "Internal Server Error",
         error: process.env.NODE_ENV === "development" ? String(error) : undefined,
@@ -74,7 +69,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       responseSent = true;
     }
   } finally {
-    // Always close the pool after the request
     try {
       if (pool) {
         await pool.end();
