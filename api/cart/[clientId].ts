@@ -100,9 +100,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 }
-      }
-    } catch (closeError) {
-      console.error("Error closing pool:", closeError);
-    }
-  }
-}

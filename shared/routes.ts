@@ -88,7 +88,7 @@ export const api = {
     },
     remove: {
       method: 'DELETE' as const,
-      path: '/api/cart/:id',
+      path: '/api/cart/item/:id',
       responses: {
         204: z.void(),
       },
