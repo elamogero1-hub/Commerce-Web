@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { storage } from "@lib/storage";
+import { db } from "../db";
+import { cartItems, products } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
@@ -24,9 +26,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const storage_instance = storage;
-    const cart = await storage_instance.getCart(Number(clientId));
-    res.status(200).json(cart);
+    const items = await db.select().from(cartItems).where(eq(cartItems.clientId, Number(clientId)));
+    const result = [];
+    for (const item of items) {
+      const [product] = await db.select().from(products).where(eq(products.id, item.productId));
+      result.push({ ...item, product });
+    }
+    res.status(200).json(result);
   } catch (error) {
     console.error("Cart API Error:", error);
     res.status(500).json({

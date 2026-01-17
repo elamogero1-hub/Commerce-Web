@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { storage } from "@lib/storage";
+import { db } from "../db";
+import { products } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -24,8 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const storage_instance = storage;
-    const product = await storage_instance.getProduct(Number(id));
+    const [product] = await db.select().from(products).where(eq(products.id, Number(id)));
     
     if (!product) {
       res.status(404).json({ message: "Product not found" });
