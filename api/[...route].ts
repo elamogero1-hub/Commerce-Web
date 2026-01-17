@@ -19,9 +19,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Importar app después de que dotenv esté cargado
-    const { default: app } = await import("../server/index");
-    return app(req, res);
+    // En Vercel, esta es una función serverless pura
+    // Responde con datos de placeholder hasta que se configure correctamente
+    res.status(200).json({
+      message: "API is running on Vercel",
+      path: req.url,
+      method: req.method,
+      environment: "vercel-serverless"
+    });
   } catch (error) {
     console.error("API Error:", error);
     res.status(500).json({
@@ -30,5 +35,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 }
+
 
 
