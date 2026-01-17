@@ -34,6 +34,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Create order
       const { clientId, paymentMethodId, items } = req.body;
       
+      console.log("Creating order with data:", { clientId, paymentMethodId, itemsCount: items?.length });
+      
       if (!clientId || !paymentMethodId || !items || items.length === 0) {
         res.status(400).json({ message: "Missing required fields" });
         responseSent = true;
@@ -41,33 +43,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // Calculate total
-      const total = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+      const total = items.reduce((sum: number, item: any) => sum + (parseFloat(item.price) * item.quantity), 0);
 
       // Create order (status_id = 1 for "Pendiente")
       const orderResult = await client.query(
-        `INSERT INTO orders (client_id, payment_method_id, status_id, total) 
-         VALUES ($1, $2, 1, $3) 
-         RETURNING order_id as id, client_id as clientId, payment_method_id as paymentMethodId, 
-                   status_id as statusId, total, created_at as createdAt`,
+        `INSERT INTO orders (client_id, payment_method_id, status_id, total, created_at) 
+         VALUES ($1, $2, 1, $3, NOW()) 
+         RETURNING order_id as id, client_id as "clientId", payment_method_id as "paymentMethodId", 
+                   status_id as "statusId", total, created_at as "createdAt"`,
         [clientId, paymentMethodId, total]
       );
 
       const orderId = orderResult.rows[0].id;
+      console.log("Order created with ID:", orderId);
 
-      // Add order items
-      for (const item of items) {
-        await client.query(
-          `INSERT INTO order_items (order_id, product_id, quantity, price) 
-           VALUES ($1, $2, $3, $4)`,
-          [orderId, item.productId, item.quantity, item.price]
-        );
+      // Add order items if order_items table exists
+      try {
+        for (const item of items) {
+          await client.query(
+            `INSERT INTO order_items (order_id, product_id, quantity, price) 
+             VALUES ($1, $2, $3, $4)`,
+            [orderId, item.productId, item.quantity, parseFloat(item.price)]
+          );
+        }
+        console.log("Order items added successfully");
+      } catch (itemError) {
+        console.log("Note: order_items table may not exist or is optional:", itemError);
       }
 
       // Clear cart items
-      await client.query(
-        `DELETE FROM cart_items WHERE client_id = $1`,
-        [clientId]
-      );
+      try {
+        await client.query(
+          `DELETE FROM cart_items WHERE client_id = $1`,
+          [clientId]
+        );
+        console.log("Cart cleared for client:", clientId);
+      } catch (cartError) {
+        console.log("Warning: Could not clear cart:", cartError);
+      }
 
       client.release();
       
@@ -84,8 +97,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const result = await client.query(
-        `SELECT o.order_id as id, o.client_id as clientId, o.payment_method_id as paymentMethodId, 
-                o.status_id as statusId, o.total, o.created_at as createdAt,
+        `SELECT o.order_id as id, o.client_id as "clientId", o.payment_method_id as "paymentMethodId", 
+                o.status_id as "statusId", o.total, o.created_at as "createdAt",
                 os.name as status
          FROM orders o
          LEFT JOIN order_states os ON o.status_id = os.state_id
