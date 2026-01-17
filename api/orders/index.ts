@@ -47,10 +47,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       // Create order (status_id = 1 for "Pendiente")
       const orderResult = await client.query(
-        `INSERT INTO orders (client_id, payment_method_id, status_id, total, created_at) 
+        `INSERT INTO orders (client_id, payment_method_id, status_id, total, order_date) 
          VALUES ($1, $2, 1, $3, NOW()) 
          RETURNING order_id as id, client_id as "clientId", payment_method_id as "paymentMethodId", 
-                   status_id as "statusId", total, created_at as "createdAt"`,
+                   status_id as "statusId", total, order_date as "orderDate"`,
         [clientId, paymentMethodId, total]
       );
 
@@ -98,12 +98,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const result = await client.query(
         `SELECT o.order_id as id, o.client_id as "clientId", o.payment_method_id as "paymentMethodId", 
-                o.status_id as "statusId", o.total, o.created_at as "createdAt",
+                o.status_id as "statusId", o.total, o.order_date as "orderDate",
                 os.name as status
          FROM orders o
          LEFT JOIN order_states os ON o.status_id = os.state_id
          WHERE o.client_id = $1
-         ORDER BY o.created_at DESC`,
+         ORDER BY o.order_date DESC`,
         [clientId]
       );
 
