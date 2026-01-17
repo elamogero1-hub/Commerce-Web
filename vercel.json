@@ -2,21 +2,8 @@
   "version": 2,
   "buildCommand": "npm run build:client",
   "outputDirectory": "dist/public",
-  "functions": {
-    "api/**/*.ts": {
-      "includeFiles": "lib/**,shared/**",
-      "maxDuration": 30
-    }
-  },
-  "routes": [
-    {
-      "src": "/api/.*",
-      "continue": true
-    },
-    {
-      "src": "/(?!api).*",
-      "dest": "/index.html"
-    }
-  ]
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
 
