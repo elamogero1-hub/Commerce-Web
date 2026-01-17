@@ -65,7 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         for (const item of items) {
           await client.query(
-            `INSERT INTO order_items (order_id, product_id, quantity, price) 
+            `INSERT INTO order_items (order_id, product_id, quantity, historical_price) 
              VALUES ($1, $2, $3, $4)`,
             [orderId, item.productId, item.quantity, parseFloat(item.price)]
           );
