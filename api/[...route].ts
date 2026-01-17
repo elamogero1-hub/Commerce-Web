@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -18,11 +18,17 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // Placeholder API response
-  res.status(404).json({
-    message: "API endpoint not found",
-    path: req.url,
-    method: req.method,
-  });
+  try {
+    // Importar app después de que dotenv esté cargado
+    const { default: app } = await import("../server/index");
+    return app(req, res);
+  } catch (error) {
+    console.error("API Error:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: process.env.NODE_ENV === "development" ? error : undefined,
+    });
+  }
 }
+
 
