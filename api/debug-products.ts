@@ -1,4 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { db } from "./db";
+import { products } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -12,24 +15,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    console.log("[DEBUG] Starting products-debug endpoint");
+    console.log("[DEBUG] Starting debug-products endpoint");
     console.log("[DEBUG] NODE_ENV:", process.env.NODE_ENV);
     console.log("[DEBUG] DATABASE_URL set:", !!process.env.DATABASE_URL);
-
-    // Try to import db
-    console.log("[DEBUG] Importing db...");
-    const { db } = await import("./db");
-    console.log("[DEBUG] db imported successfully");
-
-    // Try to import products table
-    console.log("[DEBUG] Importing products schema...");
-    const { products } = await import("@shared/schema");
-    console.log("[DEBUG] products schema imported successfully");
-
-    // Try to import drizzle-orm
-    console.log("[DEBUG] Importing drizzle-orm...");
-    const { eq } = await import("drizzle-orm");
-    console.log("[DEBUG] drizzle-orm imported successfully");
 
     // Try query
     console.log("[DEBUG] Executing SELECT query...");

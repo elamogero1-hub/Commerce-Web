@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { db } from "./db";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -20,28 +21,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       PGDATABASE: process.env.PGDATABASE ? "SET" : "NOT_SET"
     };
 
-    // Try to import and connect to database
+    // Try to connect to database
     let dbStatus = {
-      imported: false,
+      imported: true,
       connected: false,
       error: null as string | null,
       result: null as any
     };
 
     try {
-      const { db } = await import("./db");
-      dbStatus.imported = true;
-      
       // Try a simple query
-      try {
-        const result = await db.execute("SELECT 1 as connected");
-        dbStatus.connected = true;
-        dbStatus.result = result;
-      } catch (queryError) {
-        dbStatus.error = `Query failed: ${String(queryError)}`;
-      }
-    } catch (importError) {
-      dbStatus.error = `Import failed: ${String(importError)}`;
+      const result = await db.execute("SELECT 1 as connected");
+      dbStatus.connected = true;
+      dbStatus.result = result;
+    } catch (queryError) {
+      dbStatus.error = `Query failed: ${String(queryError)}`;
     }
 
     res.status(200).json({
