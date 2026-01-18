@@ -49,9 +49,10 @@ export default function Home() {
               <div className="aspect-square overflow-hidden rounded-2xl bg-muted shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500">
                 {/* Hero Lifestyle Image */}
                 <img
-                  alt="Modern Electronics Setup"
+                  alt="Productos de Calidad Premium"
                   className="h-full w-full object-cover"
-                  src="https://pixabay.com/get/gef2510bd323b20b956694cf3de2877d91054d0750567978e769b5c9e3bdcc9292f6213778661d0d9e1592d594fb7c25717bbfa6f2896f1318fbf50ea1f6548fb_1280.jpg"
+                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80"
+                  loading="eager"
                 />
               </div>
             </div>
